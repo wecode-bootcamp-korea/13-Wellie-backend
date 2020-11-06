@@ -13,7 +13,8 @@ class User(models.Model):
     usertype          = models.ForeignKey("Usertype", on_delete = models.CASCADE)
     subscribe         = models.ManyToManyField("Subscribe", through = "UserToSubscribe", related_name = "subscriber")
     following         = models.ManyToManyField("self", symmetrical = False, through = "Follow", related_name = "followed")
-    
+    shelf_name        = models.CharField(max_length = 50)
+
     class Meta:
         db_table = "users"
 
@@ -35,7 +36,7 @@ class UserToSubscribe(models.Model):
     subscribe    = models.ForeignKey(Subscribe, on_delete = models.CASCADE, related_name = "subscribe")
     started_at   = models.DateField(auto_now_add = True)
     expirated_at = models.DateField(null=True)
-    free         = models.BooleanField()
+    free         = models.BooleanField(default=False)
     number       = models.IntegerField(default = 0)
 
     class Meta:
@@ -49,3 +50,10 @@ class Follow(models.Model):
     class Meta:
         unique_together = ("follower", "reader")
         db_table        = "follows"
+
+class PhoneCheck(models.Model):
+    check_id = models.CharField(max_length = 50)
+    check_number = models.CharField(max_length = 20)
+
+    class Meta:
+        db_table        = "phonechecks"

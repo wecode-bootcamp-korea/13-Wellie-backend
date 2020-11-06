@@ -3,6 +3,7 @@ from django.db   import models
 class Book(models.Model):
     title            = models.CharField(max_length = 100)
     cover_image_url  = models.URLField(max_length = 1000)
+    small_image_url  = models.URLField(max_length = 1000, null = True)
     sub_title        = models.CharField(max_length = 100, null = True)
     subcategory      = models.ForeignKey("Subcategory", on_delete = models.CASCADE)
     introduction     = models.TextField()
@@ -11,6 +12,7 @@ class Book(models.Model):
     volume           = models.IntegerField(default = 0)
     publication_date = models.DateField()
     complete_time    = models.TimeField(null = True)
+    complete_percent = models.IntegerField(default = 0)
     publisher        = models.ForeignKey("Publisher", on_delete = models.CASCADE)
     tags             = models.ManyToManyField("Tag", through = "BookToTag", related_name = "tag_books")
     author           = models.ManyToManyField("Author", through = "BookToAuthor", related_name = "author_books")
