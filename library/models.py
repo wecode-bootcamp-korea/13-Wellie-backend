@@ -11,9 +11,10 @@ class Library(models.Model):
         db_table = "libraries"
 
 class Shelf(models.Model):
-    user       = models.ForeignKey("user.User", on_delete = models.CASCADE)
-    name       = models.CharField(max_length = 100)
-    shelfbook  = models.ManyToManyField("book.Book", through = "ShelfToBook", related_name = "bookshelf")
+    user      = models.ForeignKey("user.User", on_delete = models.CASCADE)
+    name      = models.CharField(max_length = 100)
+    shelfbook = models.ManyToManyField("book.Book", through = "ShelfToBook", related_name = "bookshelf")
+    index     = models.IntegerField(default = 1)
 
     class Meta:
         db_table = "shelves"
