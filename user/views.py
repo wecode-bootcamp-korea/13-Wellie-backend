@@ -12,12 +12,13 @@ from django.http      import JsonResponse
 from django.views     import View
 from django.db.models import Q
 
+from user.utils       import login_decorator
 from my_settings      import SECRET
 from user.models      import (
     User,
-    PhoneCheck
+    PhoneCheck,
+    UserToSubscribe
 )
-
 
 class DuplicatecheckView(View):
     def get(self, request) : 
@@ -34,9 +35,9 @@ class SignupView(View) :
 
     def post(self, request) :
         try :
-            data     = json.loads(request.body)
-            name     = data['nickName']
-            mobile   = data['userCell']
+            data   = json.loads(request.body)
+            name   = data['nickName']
+            mobile = data['userCell']
 
             if User.objects.filter(usertype=1, mobile=mobile).exists():
                 return JsonResponse({"MESSAGE": "EXISTS_MOBILE"}, status=401)
@@ -67,9 +68,9 @@ class SocialSignupView(View) :
 
     def post(self, request) :
         try :
-            data             = json.loads(request.body)
-            usertype         = data['userType']
-            name             = data['nickName']
+            data        = json.loads(request.body)
+            usertype    = data['userType']
+            name        = data['nickName']
             social_type = {
                 2 : {
                     'name'      : 'Kakao',
@@ -84,7 +85,7 @@ class SocialSignupView(View) :
             }
 
             if usertype in social_type :
-                access_token    = request.headers.get('token')
+                access_token    = request.headers.get('Authorization')
                 profile_request = requests.get(
                     social_type[usertype]['endpoint'] , headers={"Authorization" : f"Bearer {access_token}"},
                 )
@@ -113,7 +114,7 @@ class SocialSignupView(View) :
             return JsonResponse({'MESSAGE': f'Json_ERROR:{e}'}, status=400)
 
 class LoginView(View) :
-    
+
     def post(self, request) :
         try :
             data     = json.loads(request.body)
@@ -129,7 +130,7 @@ class LoginView(View) :
                 algorithm=SECRET["algorithm"]
             )
             return JsonResponse({"MESSAGE": "SUCCESS", "Authorization": token.decode("UTF-8"), "SUBSCRIBE" : user.subscribe.exists() }, status=200)
-        
+
         except User.DoesNotExist : 
             return JsonResponse({'MESSAGE': 'Signup_First'}, status=401)
         except KeyError as e :
@@ -139,9 +140,8 @@ class LoginView(View) :
         except json.JSONDecodeError as e :
             return JsonResponse({'MESSAGE': f'Json_ERROR:{e}'}, status=400)
 
-
 class SocialLoginView(View) :
-    
+
     def post(self, request) :
         try :
             data     = json.loads(request.body)
@@ -160,7 +160,7 @@ class SocialLoginView(View) :
             }
 
             if usertype in social_type :
-                access_token    = request.headers.get('token')
+                access_token    = request.headers.get('Authorization')
                 profile_request = requests.get(
                     social_type[usertype]['endpoint'] , headers={"Authorization" : f"Bearer {access_token}"},
                 )
@@ -189,7 +189,7 @@ class SocialLoginView(View) :
             return JsonResponse({'MESSAGE': f'Json_ERROR:{e}'}, status=400)
 
 class MessageSendView(View) :
-    
+
     def post(self, request) :
         data        = json.loads(request.body)
         phonenumber = data['userCell']
@@ -224,7 +224,7 @@ class MessageCheckView(View) :
 
     def post(self, request) :
         try : 
-            data = json.loads(request.body)
+            data         = json.loads(request.body)
             check_id     = data['userCell']
             check_number = data['codeInput']
             phonecheck   = PhoneCheck.objects.get(check_id=check_id) 
@@ -239,3 +239,14 @@ class MessageCheckView(View) :
             return JsonResponse({'MESSAGE': f'KEY_ERROR:{e}'}, status=400)
         except json.JSONDecodeError as e :
             return JsonResponse({'MESSAGE': f'Json_ERROR:{e}'}, status=400)
+
+class SubscribeView(View) :
+
+    @login_decorator
+    def post(self, request) :
+        try : 
+            user_id = request.user.id
+            UserToSubscribe.objects.create(user_id=user_id, subscribe_id= 1)
+            return JsonResponse({'MESSAGE': 'SUCCESS'}, status=200)
+        except :
+            return JsonResponse({'MESSAGE': 'Already subscribed'}, status=401)
