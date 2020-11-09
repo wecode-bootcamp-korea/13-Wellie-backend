@@ -84,7 +84,7 @@ class BookSearchView(View) :
     def get(self, request, keyword) :
         type   = request.GET.get('type','all')
         sort   = request.GET.get('sort','keyword')
-        limit  = int(request.GET.get('limit','30'))
+        limit  = int(request.GET.get('limit','50'))
         offset = int(request.GET.get('offset','0'))
 
         type_filter = {

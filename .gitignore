@@ -280,5 +280,5 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,django,git,vscode,windows,linux
 
-# twillo.env
+# twilio.env
 twilio.env

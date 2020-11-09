@@ -17,6 +17,7 @@ class Shelf(models.Model):
     index     = models.IntegerField(default = 1)
 
     class Meta:
+        unique_together = ("user", "index")
         db_table = "shelves"
 
 class ShelfToBook(models.Model):

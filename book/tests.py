@@ -2,7 +2,6 @@ import json
 import jwt
 
 from django.test    import TestCase, Client
-from unittest.mock  import patch, MagicMock
 
 from my_settings    import SECRET
 from user.models    import User, Usertype
@@ -437,7 +436,7 @@ class BookLikeTest(TestCase):
     def setUp(self):
         Publisher.objects.create( id=1, name='Publisher', introduction='introduction')
         Category.objects.create(id=1, name = "cate", complete_time='1:01', complete_percent =10)
-        Subcategory.objects.create(id=1, name='best',category_id =1)
+        Subcategory.objects.create(id=1, name='베스트셀러',category_id =1)
         Book.objects.create( 
             id               = 1,
             title            = 'title',
